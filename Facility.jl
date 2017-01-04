@@ -1,3 +1,20 @@
+function distribute(f)
+    function fs(dict :: Dict, xs...)
+        for i in values(dict)
+            fs(i, xs...)
+        end
+    end
+    function fs(arr :: Array, xs...)
+        for i in arr
+            fs(i, xs...)
+        end
+    end
+    function fs(xs...)
+        f(xs...)
+    end
+    fs
+end
+
 function combination{T}(xs :: Array{T, 1})
     if length(xs) < 2
         []

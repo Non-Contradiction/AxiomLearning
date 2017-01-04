@@ -31,3 +31,30 @@ pprint(m) = print(beautify(m))
 function bottom_up(func :: Function, tree :: Tree)
     func(tree, [bottom_up(func, t) for t in tree.subtrees])
 end
+
+function toTree(op)
+    Tree(op, Dict(), [])
+end
+
+function toTree(skeleton :: Array)
+    op = skeleton[1]
+    subs = skeleton[2:end]
+    Tree(op, Dict(), [toTree(s) for s in subs])
+end
+
+function add!(dict :: Dict, dict1 :: Dict)
+    for key in keys(dict1)
+        dict[key] = vcat(get!(dict, key, []), dict1[key])
+    end
+    dict
+end
+
+function _index(tree :: Tree, inds :: Array)
+    ind = Dict{Any, Any}(tree.op => [tree])
+    for ind1 in inds
+        add!(ind, ind1)
+    end
+    ind
+end
+
+index(tree :: Tree) = bottom_up(_index, tree)
