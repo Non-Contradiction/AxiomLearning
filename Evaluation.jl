@@ -25,7 +25,7 @@ function _init_tree!(tree :: Tree, _)
     init_node!(tree.op, tree.value)
     tree
 end
-
+    
 function init_tree!(tree :: Tree)
     bottom_up(_init_tree!, tree)
 end
@@ -44,16 +44,7 @@ function eval_node!(op :: DFunction, value :: Dict, value_list)
     A_mul_B!(value[:pre_transform], op.f_matrix, value[:pre_matrix])
     value[:value] .= eval(op.f_transformation).(value[:pre_transform])
 end
-
-function _eval_tree!(tree :: Tree, _)
-    eval_node!(tree.op, tree.value, (t.value for t in tree.subtrees))
-    tree
-end
-
-## function eval_tree!(tree :: Tree)
-##     bottom_up(_eval_tree!, tree)
-## end
-
+    
 function eval_tree!(tree :: Tree)
     foreach(eval_tree!, tree.subtrees)
     eval_node!(tree.op, tree.value, (t.value for t in tree.subtrees))

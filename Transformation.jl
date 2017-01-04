@@ -3,6 +3,10 @@ immutable Transformation
     deriv :: Function
 end
 
+function Base.show(io :: IO, m :: Transformation)
+    print(io, string("Transformation(", m.self, ")"))
+end
+
 import Core.eval
 
 function eval(transformation :: Transformation)
@@ -14,13 +18,13 @@ function deriv(transformation :: Transformation)
 end
 
 function sigmoid(x)
-        1. / (1. + exp(-x)) - 0.5
+        2. / (1. + exp(-x)) - 1.
 end
 
 function dsigmoid(x)
-    exp(-x) / (1. + exp(-x))^2
+    2. * exp(-x) / (1. + exp(-x)) ^ 2
 end
 
 const Sigmoid = Transformation(sigmoid, dsigmoid)
 
-const Identity = Transformation(identity, one)
+const Identity = Transformation(identity, one) 
