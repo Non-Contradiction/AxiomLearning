@@ -1,6 +1,6 @@
 immutable Transformation
-    self :: Function
-    deriv :: Function
+    self :: Symbol
+    deriv :: Symbol
 end
 
 function Base.show(io :: IO, m :: Transformation)
@@ -10,11 +10,11 @@ end
 import Core.eval
 
 function eval(transformation :: Transformation)
-    transformation.self
+    eval(transformation.self)
 end
 
 function deriv(transformation :: Transformation)
-    transformation.deriv
+    eval(transformation.deriv)
 end
 
 function sigmoid(x)
@@ -25,6 +25,6 @@ function dsigmoid(x)
     2. * exp(-x) / (1. + exp(-x)) ^ 2
 end
 
-const Sigmoid = Transformation(sigmoid, dsigmoid)
+const Sigmoid = Transformation(:sigmoid, :dsigmoid)
 
-const Identity = Transformation(identity, one) 
+const Identity = Transformation(:identity, :one) 

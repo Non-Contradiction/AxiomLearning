@@ -15,6 +15,12 @@ function distribute(f)
     fs
 end
 
+function _inject(sym :: Symbol, dict :: Dict)
+    dict[string(sym)] = eval(sym)
+end
+
+inject = distribute(_inject)
+
 function combination{T}(xs :: Array{T, 1})
     if length(xs) < 2
         []
