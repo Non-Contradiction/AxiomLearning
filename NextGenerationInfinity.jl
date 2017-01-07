@@ -5,6 +5,7 @@ include("Tree.jl")
 include("Evaluation.jl")
 include("BackPropogation.jl")
 include("Facility.jl")
+import Base.push!
 
 type Axiom
     tree1 :: Tree
@@ -88,9 +89,14 @@ end
 
 train_axioms! = distribute(train_axiom!)
 
-## to prevent degeneration problem, we use anti-traing to deal with the problem.
+## To prevent degeneration problem, we use anti-training to deal with the problem.
+## The current method to deal with degeneration is anti-training: to push random evaluation results far away,
+## but the defect now is that it is unstable in long term.
+## One possible remedy is to anti-train only when the random evaluation results are "too near".
 
-function anti_train_axiom!(axiom :: Axiom, n = 1, randomize = identity)
+const DefaultThreshold = 0.1
+
+function anti_train_axiom!(axiom :: Axiom, n = 1, randomize = identity, thres = DefaultThreshold)
     d1 :: Array{Float64, 1} = axiom.tree1.value[:d]
     d2 :: Array{Float64, 1} = axiom.tree2.value[:d]
     v1 :: Array{Float64, 1} = axiom.tree1.value[:value]
@@ -100,12 +106,14 @@ function anti_train_axiom!(axiom :: Axiom, n = 1, randomize = identity)
         randomize(axiom.tree2)
         eval_tree!(axiom.tree2)
         eval_tree!(axiom.tree1)
-        for j in 1:length(d1)
-            d1[j] = - loss(v1[j], v2[j])
-            d2[j] = - loss(v2[j], v1[j])
+        if mean((v1 - v2) .^ 2) < thres
+            for j in 1:length(d1)
+                d1[j] = - loss(v1[j], v2[j])
+                d2[j] = - loss(v2[j], v1[j])
+            end
+            bp_tree!(axiom.tree1)
+            bp_tree!(axiom.tree2)
         end
-        bp_tree!(axiom.tree1)
-        bp_tree!(axiom.tree2)
     end
 end
 
