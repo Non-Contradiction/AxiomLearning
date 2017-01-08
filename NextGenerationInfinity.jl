@@ -64,7 +64,7 @@ init_axioms! = distribute(init_axiom!)
 ## add some loss function to deal with degenerating problem?
 
 function loss(a, b)
-    b * (1. - a * b)
+    b - a
 end
 
 function train_axiom!(axiom :: Axiom, variables, n = 1, randomize = identity)
