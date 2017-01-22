@@ -1,7 +1,18 @@
+function limit(x :: Float64)
+    if abs(x) < 10000.
+        x
+    elseif x < 0
+        -10000.
+    else
+        10000.
+    end
+end
+
 function bp_transformation!(transformation, inputs, d, new_d)
     new_d .= deriv(transformation).(inputs)
     for i in 1:length(d)
         new_d[i] *= d[i]
+        new_d[i] = limit(new_d[i])
     end
 end
 
@@ -12,8 +23,10 @@ function bp_matrix!(inputs, matrix, d, step, new_d)
     for j in 1:size(matrix, 2)
         new_d[j] = 0.0
         for i in 1:size(matrix, 1)
-            matrix[i, j] += step * d[i] * inputs[j]
+            matrix[i, j] += step * limit(d[i] * inputs[j])
+            matrix[i, j] = limit(matrix[i, j])
             new_d[j] += matrix[i, j] * d[i]
+            new_d[j] = limit(new_d[j])
         end
     end
 end
